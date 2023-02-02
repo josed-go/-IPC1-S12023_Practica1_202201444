@@ -38,11 +38,12 @@ public class Main {
 
         // MENU
         do {
-            System.out.println("======= MENU =======");
+            System.out.println("\n======= MENU =======");
             System.out.println("| 1 | AGREGAR PRODUCTOS");
-            System.out.println("| 2 | AGREGAR CUPONES DE DESCUENTO");
-            System.out.println("| 3 | REALIZAR VENTAS");
-            System.out.println("| 4 | GENERAR REPORTES");
+            System.out.println("| 2 | MOSTRAR PRODUCTOS");
+            System.out.println("| 3 | AGREGAR CUPONES DE DESCUENTO");
+            System.out.println("| 4 | REALIZAR VENTAS");
+            System.out.println("| 5 | GENERAR REPORTES");
             System.out.println("INGRESE UNA OPCIÓN");
             option = sc.nextLine();
             flag = true;
@@ -52,16 +53,19 @@ public class Main {
                     addProduct();
                     break;
                 case "2":
+                    System.out.println("======= MOSTRAR PRODUCTOS =======");
+                    ShowProducts();
+                    break;
+                case "3":
                     System.out.println("======= AGREGAR CUPONES DE DESCUENTO =======");
                     AgregarCupones();
                     break;
-                case "3":
+                case "4":
                     System.out.println("======= REALIZAR VENTAS =======");
                     RealizarVentas();
                     break;
-                case "4":
+                case "5":
                     System.out.println("======= GENERAR REPORTES =======");
-                    MostrarProductos();
                     break;
                 default:
                     flag = false;
@@ -184,12 +188,15 @@ public class Main {
     }
 
     // METODO PARA VER LOS PRODUCTOS AGREGADOS
-    public static void MostrarProductos() {
+    public static void ShowProducts() {
+        System.out.println("|==== PRODUCTO ====|==== PRECIO ====|");
         for (int i = 0; i < products.length; i++){
-            for (int j = 0; j < products[0].length; j++){
-                System.out.println(products[i][j]);
-            }
+                if(products[i][0] != null) {
+                    System.out.println("|     "+products[i][0]+ "     |     "+products[i][1]+"     |");
+                    System.out.println("|===================================|\n");
+                }
         }
+        flag = false;
     }
     public static void AgregarCupones() {
         System.out.println("Metodo agregar cupones");
