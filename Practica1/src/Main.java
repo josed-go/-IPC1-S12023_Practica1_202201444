@@ -2,11 +2,15 @@ import java.util.Scanner;
 
 public class Main {
     static String[][] products = new String[20][2];
+    static String[][] coupons = new String[20][2];
     static Scanner sc = new Scanner(System.in);
     static boolean flag;
     static String productName;
     static String productPrice;
-    static int contF = 0;
+    static int contP = 0;
+    static String couponCode;
+    static String discountPercentage;
+    static int contC = 0;
     public static void main(String[] args) {
         String user = "cajero_202201444";
         String password = "ipc1_202201444";
@@ -34,7 +38,7 @@ public class Main {
                 System.out.println("DATOS INCORRECTOS");
             }
         }
-        System.out.println("======= BIENVENIDO USUARIO "+user+" =======\n");
+        System.out.println("======= BIENVENIDO USUARIO "+user+" =======");
 
         // MENU
         do {
@@ -50,7 +54,7 @@ public class Main {
             switch (option) {
                 case "1":
                     System.out.println("======= AGREGAR PRODUCTO =======");
-                    addProduct();
+                    AddProduct();
                     break;
                 case "2":
                     System.out.println("======= MOSTRAR PRODUCTOS =======");
@@ -58,7 +62,7 @@ public class Main {
                     break;
                 case "3":
                     System.out.println("======= AGREGAR CUPONES DE DESCUENTO =======");
-                    AgregarCupones();
+                    AddCoupons();
                     break;
                 case "4":
                     System.out.println("======= REALIZAR VENTAS =======");
@@ -66,6 +70,8 @@ public class Main {
                     break;
                 case "5":
                     System.out.println("======= GENERAR REPORTES =======");
+                    GenerarReportes();
+                    ShowCoupons();
                     break;
                 default:
                     flag = false;
@@ -75,7 +81,7 @@ public class Main {
 
     }
 
-    public static void addProduct() {
+    public static void AddProduct() {
         String resp;
         boolean flagP = true;
         boolean flagO = true;
@@ -123,7 +129,7 @@ public class Main {
 
     public static void MethodAddProduct() {
 
-        if(contF != products.length) {
+        if(contP != products.length) {
             System.out.println("INGRESA EL NOMBRE DEL PRODUCTO");
             productName = sc.nextLine();
             System.out.println("INGRESA EL PRECIO DEL PRODUCTO");
@@ -131,10 +137,10 @@ public class Main {
 
             if(ValidateProductName(productName) != true) {
                 if(ValidateProductPrice(productPrice) == true) {
-                    products[contF][0] = productName;
-                    products[contF][1] = productPrice;
+                    products[contP][0] = productName;
+                    products[contP][1] = productPrice;
                     System.out.println("======= PRODUCTO AGREGADO =======");
-                    contF++;
+                    contP++;
                 }
             } else {
                 System.out.println("YA EXISTE UN PRODUCTO CON ESE NOMBRE");
@@ -198,8 +204,130 @@ public class Main {
         }
         flag = false;
     }
-    public static void AgregarCupones() {
-        System.out.println("Metodo agregar cupones");
+
+    public static void AddCoupons() {
+        String resp;
+        boolean flagC = true;
+        boolean flagO = true;
+        do {
+            System.out.println("¿DESEAR AGREGAR UN CUPÓN?");
+            resp = sc.nextLine();
+            flagC = true;
+
+            switch(resp.toLowerCase()) {
+                case "si":
+                    MethodAddCoupon();
+                    do {
+                        System.out.println("¿DESEAS AGREGAR OTRO CUPÓN?");
+                        resp = sc.nextLine();
+                        flagO = true;
+                        switch (resp.toLowerCase()) {
+                            case "si":
+                                MethodAddCoupon();
+                                flagO = false;
+                                break;
+                            case "no":
+                                flag = false;
+                                break;
+                            default:
+                                flagO = false;
+                                System.out.println("OPCIÓN NO VALIDA\n");
+                        }
+                    } while(flagO == false);
+
+                    break;
+                case "no":
+                    flag = false;
+                    break;
+                default:
+                    flagC = false;
+                    System.out.println("OPCIÓN NO VALIDA\n");
+            }
+        } while(flagC == false);
+    }
+
+    // METODO PARA AGREGAR CUPONES
+    public static void MethodAddCoupon() {
+
+        if (contC != coupons.length) {
+            System.out.println("INGRESA EL CÓDIGO DEL CUPÓN (4 CARACTERES)");
+            couponCode = sc.nextLine();
+            System.out.println("INGRESA EL PORCENTAJE DE DESCUENTO (0-100)%");
+            discountPercentage = sc.nextLine();
+
+            if(ValidateCouponCode(couponCode) != true) {
+                if(ValidateDiscountPercentage(discountPercentage) == true) {
+                    coupons[contC][0] = couponCode.toUpperCase();
+                    coupons[contC][1] = discountPercentage;
+                    System.out.println("======= CUPÓN AGREGADO =======");
+                    contC++;
+                }
+            }
+
+        } else {
+            System.out.println("LIMITE DE CUPONES ALCANZADO");
+        }
+    }
+
+    // METODO PARA VALIDAR EL CODIGO DEL CUPON
+    public static boolean ValidateCouponCode(String couponCode) {
+        boolean flag = false;
+
+        if(couponCode.length() == 4) {
+            for (int i = 0; i < coupons.length; i++) {
+                if (coupons[i][0] != null) {
+                    if (coupons[i][0].equalsIgnoreCase(couponCode)) {
+                        flag = true;
+                        System.out.println("YA EXISTE UN CUPÓN CON ESE CÓDIGO");
+                    }
+                }
+            }
+        } else {
+            System.out.println("EL CÓDIGO DEBE SER DE 4 CARACTERES");
+            flag = true;
+        }
+        return flag;
+    }
+
+    // METODO PARA VALIDAR EL PORCENTAJE INGRESADO
+    public static boolean ValidateDiscountPercentage(String discountPercentage) {
+        boolean flag = false;
+        boolean result = true;
+        double discountP = 0;
+
+        try {
+            discountP = Double.parseDouble(discountPercentage);
+        } catch (NumberFormatException e) {
+            result = false;
+        }
+
+        if(result == true) {
+
+            if (discountP >= 1 && discountP <= 100) {
+                flag = true;
+            } else {
+                System.out.println("PORCENTAJE NO VALIDO");
+                flag = false;
+            }
+
+        } else {
+            System.out.println("CUPÓN NO AGREGADO");
+            System.out.println("POR FAVOR INGRESE UN NÚMERO");
+            flag = false;
+        }
+        return flag;
+    }
+
+    // METODO PARA MOSTRAR TODOS LOS CUPONES
+    public static void ShowCoupons() {
+        System.out.println("|==== CÓDIGO ====|==== DESCUENTO ====|");
+        for (int i = 0; i < coupons.length; i++){
+            if(coupons[i][0] != null) {
+                System.out.println("|       "+coupons[i][0]+ "     |        "+coupons[i][1]+"%         |");
+                System.out.println("|===================================|");
+            }
+        }
+        flag = false;
     }
 
     public static void RealizarVentas() {
