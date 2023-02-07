@@ -1,10 +1,8 @@
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class Main {
     static String[][] products = new String[20][3];
-    static String[][] coupons = new String[20][2];
+    static String[][] coupons = new String[20][3];
     static String[][] productsClient = new String[20][3];
     static Scanner sc = new Scanner(System.in);
     static boolean flag;
@@ -18,6 +16,7 @@ public class Main {
     static double subTotal = 0;
     static double total = 0;
     static double disPer;
+    static String date;
     public static void main(String[] args) {
         String user = "cajero_202201444";
         String password = "ipc1_202201444";
@@ -35,7 +34,7 @@ public class Main {
                 "                                                    \n");
 
         // LOGIN
-        /*while (!userL.equals(user) || !passL.equals(password)) {
+        while (!userL.equals(user) || !passL.equals(password)) {
             System.out.println("======= POR FAVOR INGRESAR TUS CREDENCIALES =======");
             System.out.println("INGRESAR USUARIO:");
             userL = sc.nextLine();
@@ -44,7 +43,7 @@ public class Main {
             if(!userL.equals(user) && !passL.equals(password)) {
                 System.out.println("DATOS INCORRECTOS");
             }
-        }*/
+        }
         System.out.println("======= BIENVENIDO USUARIO "+user+" =======");
 
         // MENU
@@ -276,6 +275,7 @@ public class Main {
                 if(ValidateDiscountPercentage(discountPercentage) == true) {
                     coupons[contC][0] = couponCode.toUpperCase();
                     coupons[contC][1] = discountPercentage;
+                    coupons[contC][2] = "no";
                     System.out.println("======= CUPÓN AGREGADO =======");
                     contC++;
                 }
@@ -365,17 +365,17 @@ public class Main {
             option = sc.nextLine();
             switch (option) {
                 case "1":
-                    if(nameClient == "") {
-                        System.out.println("INGRESE SU NIT");
-                        nit = sc.nextLine();
+                    System.out.println("INGRESA LA FECHA (dd-mm-YYYY)");
+                    date = sc.nextLine();
+                    System.out.println("INGRESE SU NIT");
+                    nit = sc.nextLine();
 
-                        if(nit.length() == 0) {
-                            nit = "CF";
-                            nameClient = "C/F";
-                        } else {
-                            System.out.println("INGRESE EL NOMBRE DEL CLIENTE");
-                            nameClient = sc.nextLine();
-                        }
+                    if(nit.length() == 0) {
+                        nit = "CF";
+                        nameClient = "C/F";
+                    } else {
+                        System.out.println("INGRESE EL NOMBRE DEL CLIENTE");
+                        nameClient = sc.nextLine();
                     }
 
                     AddProductClient();
@@ -479,7 +479,7 @@ public class Main {
         System.out.println("CANT.   PRODUCTO          TOTAL");
         for(int i = 0; i < productsClient.length; i++) {
             if( productsClient[i][0] != null ) {
-                System.out.println(productsClient[i][1]+" "+productsClient[i][0]+"      "+productsClient[i][2]);
+                System.out.println(productsClient[i][1]+"       "+productsClient[i][0]+"             "+productsClient[i][2]);
             }
         }
     }
@@ -495,10 +495,11 @@ public class Main {
             code = sc.nextLine();
 
             for (int i = 0; i < coupons.length; i++) {
-                if( coupons[i][0] != null) {
+                if( coupons[i][0] != null && coupons[i][2].equalsIgnoreCase("no")) {
                     if(coupons[i][0].equalsIgnoreCase(code)) {
                         flagD = true;
                         percentage = Double.parseDouble(coupons[i][1]);
+                        coupons[i][2] = "si";
                     }
                 }
             }
@@ -529,12 +530,12 @@ public class Main {
         System.out.println("CAJERO: JOSÉ DAVID GÓNGORA OLMEDO");
         System.out.println("CLIENTE: " +name);
         System.out.println("NIT: "+nit);
-        System.out.println(LocalDateTime.now());
+        System.out.println("FECHA: "+date);
         ShowProductsClient();
         System.out.println("SUBTOTAL                "+subTotal);
         System.out.println("DESCUENTO               "+disPer+"%");
         System.out.println("TOTAL                   "+total);
-
+        ClearData();
     }
     public static boolean ValidateNumberProduct(String number) {
         int cont = 0;
@@ -567,8 +568,23 @@ public class Main {
 
     }
 
-    public static void GenerarReportes() {
-        System.out.println("Metodo generar reportes");
+    public static void ClearData() {
+        for(int i = 0; i < productsClient.length; i++) {
+            for(int j=0; j < productsClient[0].length; j++) {
+                productsClient[i][j] = null;
+            }
+        }
+        subTotal = 0;
+        total = 0;
+    }
 
+    public static void GenerarReportes() {
+        System.out.println("|==== PRODUCTO ====|==== CANT. VENDIDA ====|");
+        for (int i = 0; i < products.length; i++){
+            if(products[i][0] != null) {
+                System.out.println("| "+products[i][0]+ "     |     "+products[i][2]+"   |");
+                System.out.println("|===================================|");
+            }
+        }
     }
 }
