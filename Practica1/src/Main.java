@@ -4,6 +4,7 @@ public class Main {
     static String[][] products = new String[20][3];
     static String[][] coupons = new String[20][3];
     static String[][] productsClient = new String[20][3];
+    static String[][] report = new String[20][2];
     static Scanner sc = new Scanner(System.in);
     static boolean flag;
     static String productName;
@@ -79,14 +80,15 @@ public class Main {
                     break;
                 case "5":
                     System.out.println("======= REALIZAR VENTAS =======");
-                    RealizarVentas();
+                    Sale();
                     break;
                 case "6":
-                    System.out.println("======= GENERAR REPORTES =======");
-                    GenerarReportes();
+                    System.out.println("======= REPORTE =======");
+                    GenerateReport();
+                    flag = false;
                     break;
                 case "7":
-                    System.out.println("======= CERRANDO PROGRAMA =======");
+                    System.out.println("\n======= CERRANDO PROGRAMA =======\n");
                     System.exit(0);
                     break;
                 default:
@@ -347,7 +349,7 @@ public class Main {
         flag = false;
     }
 
-    public static void RealizarVentas() {
+    public static void Sale() {
         String option;
         String resp;
         String nameClient = "";
@@ -392,7 +394,7 @@ public class Main {
                                 flagR = true;
                                 flagV = false;
 
-                                System.out.println("SUBTOTAL: Q."+subTotal);
+                                System.out.println("SUBTOTAL: Q."+String.format("%.2f",subTotal));
                                 ApplyDiscount();
                                 System.out.println("\n======= GENERANDO FACTURA =======");
                                 Bill(nit, nameClient);
@@ -465,9 +467,9 @@ public class Main {
                 if(i == num) {
                     productsClient[contV][0] = products[i][0];
                     productsClient[contV][1] = amount;
-                    productsClient[contV][2] = Integer.toString(Integer.parseInt(products[i][1])*amountP);
+                    productsClient[contV][2] = Double.toString(Double.parseDouble(products[i][1])*amountP);
                     products[i][2] = Integer.toString(Integer.parseInt(products[i][2]) + amountP);
-                    subTotal = subTotal + Integer.parseInt(products[i][1])*amountP;
+                    subTotal = subTotal + Double.parseDouble(products[i][1])*amountP;
                 }
 
             }
@@ -476,10 +478,12 @@ public class Main {
     }
 
     public static void ShowProductsClient() {
+        String totalP;
         System.out.println("CANT.   PRODUCTO          TOTAL");
         for(int i = 0; i < productsClient.length; i++) {
             if( productsClient[i][0] != null ) {
-                System.out.println(productsClient[i][1]+"       "+productsClient[i][0]+"             "+productsClient[i][2]);
+                totalP = String.format("%.2f",Double.parseDouble(productsClient[i][2]));
+                System.out.println(productsClient[i][1]+"       "+productsClient[i][0]+"             "+totalP);
             }
         }
     }
@@ -532,9 +536,9 @@ public class Main {
         System.out.println("NIT: "+nit);
         System.out.println("FECHA: "+date);
         ShowProductsClient();
-        System.out.println("SUBTOTAL                "+subTotal);
+        System.out.println("SUBTOTAL                "+String.format("%.2f",subTotal));
         System.out.println("DESCUENTO               "+disPer+"%");
-        System.out.println("TOTAL                   "+total);
+        System.out.println("TOTAL                   "+String.format("%.2f",total));
         ClearData();
     }
     public static boolean ValidateNumberProduct(String number) {
@@ -578,11 +582,40 @@ public class Main {
         total = 0;
     }
 
-    public static void GenerarReportes() {
+    // METODO PARA GENERAR REPORTE
+    public static void GenerateReport() {
+        String auxA;
+        String auxB;
         System.out.println("|==== PRODUCTO ====|==== CANT. VENDIDA ====|");
         for (int i = 0; i < products.length; i++){
             if(products[i][0] != null) {
-                System.out.println("| "+products[i][0]+ "     |     "+products[i][2]+"   |");
+                report[i][0] = products[i][0];
+                if(products[i][2] == null) {
+                    report[i][1] = "0";
+                } else {
+                    report[i][1] = products[i][2];
+                }
+            }
+        }
+
+        for (int i = 1; i < (report.length); i++) {
+            for (int j = report.length-1; j >= i; j--) {
+                if(report[j][0] != null) {
+                    if(Integer.parseInt(report[j][1]) > Integer.parseInt(report[j-1][1])) {
+                        auxA = report[j][1];
+                        auxB = report[j][0];
+                        report[j][1] = report[j-1][1];
+                        report[j][0] = report[j-1][0];
+                        report[j-1][1] = auxA;
+                        report[j-1][0] = auxB;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < report.length; i++) {
+            if(report[i][0] != null) {
+                System.out.println("|        "+report[i][0]+ "     |     "+report[i][1]+"   |");
                 System.out.println("|===================================|");
             }
         }
